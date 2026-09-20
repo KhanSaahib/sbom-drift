@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbom-drift"
+version = "0.1.0"
+description = "Offline CycloneDX SBOM linter and drift detector"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "KhanSaahib" }]
+dependencies = []
+
+[project.scripts]
+sbom-drift = "sbom_drift.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["sbom_drift*"]

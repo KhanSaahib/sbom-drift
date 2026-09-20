@@ -1,0 +1,44 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "components": [
+    {
+      "type": "library",
+      "name": "no-hash-pkg",
+      "version": "1.0.0",
+      "purl": "pkg:npm/no-hash-pkg@1.0.0",
+      "licenses": [{"license": {"id": "MIT"}}]
+    },
+    {
+      "type": "library",
+      "name": "no-license-pkg",
+      "version": "2.0.0",
+      "purl": "pkg:npm/no-license-pkg@2.0.0",
+      "hashes": [{"alg": "SHA-256", "content": "1234abcd"}]
+    },
+    {
+      "type": "library",
+      "name": "floating-pkg",
+      "version": "latest",
+      "purl": "pkg:npm/floating-pkg@latest",
+      "hashes": [{"alg": "SHA-256", "content": "5678efab"}],
+      "licenses": [{"license": {"id": "MIT"}}]
+    },
+    {
+      "type": "library",
+      "name": "confused-pkg",
+      "version": "1.0.0",
+      "purl": "pkg:npm/confused-pkg",
+      "hashes": [{"alg": "SHA-256", "content": "aaa000"}],
+      "licenses": [{"license": {"id": "MIT"}}]
+    },
+    {
+      "type": "library",
+      "name": "confused-pkg",
+      "version": "1.1.0",
+      "purl": "pkg:npm/confused-pkg",
+      "hashes": [{"alg": "SHA-256", "content": "bbb111"}],
+      "licenses": [{"license": {"id": "MIT"}}]
+    }
+  ]
+}

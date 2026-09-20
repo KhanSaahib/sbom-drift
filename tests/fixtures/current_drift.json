@@ -1,0 +1,31 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:22222222-2222-2222-2222-222222222222",
+  "components": [
+    {
+      "type": "library",
+      "name": "left-pad",
+      "version": "1.3.0",
+      "purl": "pkg:npm/left-pad@1.3.0",
+      "hashes": [{"alg": "SHA-256", "content": "ffff9999"}],
+      "licenses": [{"license": {"id": "MIT"}}]
+    },
+    {
+      "type": "library",
+      "name": "requests",
+      "version": "2.32.0",
+      "purl": "pkg:pypi/requests@2.32.0",
+      "hashes": [{"alg": "SHA-256", "content": "dddd4444"}],
+      "licenses": [{"license": {"id": "Apache-2.0"}}]
+    },
+    {
+      "type": "library",
+      "name": "mystery-pkg",
+      "version": "0.0.1",
+      "purl": "pkg:npm/mystery-pkg@0.0.1",
+      "hashes": [{"alg": "SHA-256", "content": "eeee5555"}],
+      "licenses": []
+    }
+  ]
+}
