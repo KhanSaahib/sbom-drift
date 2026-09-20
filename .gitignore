@@ -1,7 +1,11 @@
 __pycache__/
-*.pyc
+*.py[cod]
+.coverage
 .pytest_cache/
+.pytest-tmp/
 build/
 dist/
 *.egg-info/
 .venv/
+report.json
+report.md

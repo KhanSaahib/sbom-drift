@@ -8,7 +8,7 @@ was reused verbatim.
 ## Data format
 
 - **CycloneDX specification** — https://cyclonedx.org/ — Apache License 2.0.
-  `sbom_drift/cyclonedx.py` reads the public CycloneDX 1.4/1.5 JSON schema
+  `sbom_drift/cyclonedx.py` reads the public CycloneDX JSON field layout
   (field names such as `bomFormat`, `components`, `purl`, `hashes`,
   `licenses`). Only the documented, public JSON field layout was consulted;
   no code from the CycloneDX tooling repositories was copied.

@@ -1,4 +1,6 @@
 import unittest
+import json
+import tempfile
 from pathlib import Path
 
 from sbom_drift.cyclonedx import load
@@ -38,6 +40,27 @@ class LintTests(unittest.TestCase):
         ranks = {"high": 3, "medium": 2, "low": 1, "info": 0}
         severities = [ranks[f.severity] for f in lint(doc)]
         self.assertEqual(severities, sorted(severities, reverse=True))
+
+    def test_nested_components_are_loaded_and_linted(self):
+        payload = {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.5",
+            "components": [
+                {
+                    "name": "parent",
+                    "version": "1.0",
+                    "hashes": [{"alg": "SHA-256", "content": "AA"}],
+                    "licenses": [{"license": {"id": "MIT"}}],
+                    "components": [{"name": "nested", "version": "latest"}],
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "nested.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            doc = load(path)
+        self.assertEqual({component.name for component in doc.components}, {"parent", "nested"})
+        self.assertIn("unknown-version", {finding.check for finding in lint(doc)})
 
 
 if __name__ == "__main__":

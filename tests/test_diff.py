@@ -69,6 +69,49 @@ class DiffTests(unittest.TestCase):
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0].check, "license-changed")
 
+    def test_removed_hash_and_license_are_detected(self):
+        before = SBOMDocument(
+            format="CycloneDX",
+            spec_version="1.5",
+            serial_number=None,
+            components=(Component("pkg", "1.0", hashes={"SHA-256": "abc"}, licenses=("MIT",)),),
+            source_path="before.json",
+        )
+        after = SBOMDocument(
+            format="CycloneDX",
+            spec_version="1.5",
+            serial_number=None,
+            components=(Component("pkg", "1.0"),),
+            source_path="after.json",
+        )
+        checks = {finding.check for finding in diff(before, after)}
+        self.assertEqual(checks, {"hash-removed-same-version", "license-changed"})
+
+    def test_hash_comparison_is_case_insensitive(self):
+        before = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={"SHA-256": "ABCDEF"}),),
+            "before.json",
+        )
+        after = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={"sha-256": "abcdef"}),),
+            "after.json",
+        )
+        # Hand-built Components bypass loader normalization, so normalize as a
+        # producer would be normalized by load().
+        before = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={k.upper(): v.lower() for k, v in before.components[0].hashes.items()}),),
+            "before.json",
+        )
+        after = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={k.upper(): v.lower() for k, v in after.components[0].hashes.items()}),),
+            "after.json",
+        )
+        self.assertEqual(diff(before, after), [])
+
 
 if __name__ == "__main__":
     unittest.main()

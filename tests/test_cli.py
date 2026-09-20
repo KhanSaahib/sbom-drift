@@ -17,6 +17,11 @@ def run_cli(args):
 
 
 class CliTests(unittest.TestCase):
+    def test_version(self):
+        with self.assertRaises(SystemExit) as raised:
+            main(["--version"])
+        self.assertEqual(raised.exception.code, 0)
+
     def test_lint_clean_sbom_exits_zero(self):
         code, out, _ = run_cli(["lint", str(FIXTURES / "baseline.json")])
         self.assertEqual(code, 0)

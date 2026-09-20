@@ -83,10 +83,20 @@ def diff(baseline: SBOMDocument, current: SBOMDocument) -> list[Finding]:
                     details={"before_hashes": before.hashes, "after_hashes": after.hashes},
                 )
             )
+        elif before.hashes and not after.hashes:
+            findings.append(
+                Finding(
+                    check="hash-removed-same-version",
+                    severity="medium",
+                    component=before.coordinate,
+                    message="integrity hashes disappeared while name and version stayed identical",
+                    details={"before_hashes": before.hashes, "after_hashes": after.hashes},
+                )
+            )
 
         before_licenses = set(before.licenses)
         after_licenses = set(after.licenses)
-        if before_licenses and after_licenses and before_licenses != after_licenses:
+        if before_licenses != after_licenses:
             findings.append(
                 Finding(
                     check="license-changed",

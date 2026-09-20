@@ -15,6 +15,19 @@ from .findings import Finding, sort_findings
 UNKNOWN_VERSION_MARKERS = {"", "latest", "unknown", "0.0.0", "unspecified"}
 
 
+def check_missing_name(components: tuple[Component, ...]) -> list[Finding]:
+    return [
+        Finding(
+            check="missing-name",
+            severity="high",
+            component=c.coordinate or "(unnamed component)",
+            message="component has no name and cannot be tracked reliably across SBOMs",
+        )
+        for c in components
+        if not c.name.strip()
+    ]
+
+
 def check_missing_hash(components: tuple[Component, ...]) -> list[Finding]:
     findings = []
     for c in components:
@@ -98,6 +111,7 @@ def check_duplicate_components(components: tuple[Component, ...]) -> list[Findin
 
 
 CHECKS = (
+    check_missing_name,
     check_missing_hash,
     check_missing_license,
     check_unknown_version,

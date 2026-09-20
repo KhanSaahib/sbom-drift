@@ -1,5 +1,9 @@
 # sbom-drift
 
+[![CI](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 Offline CycloneDX SBOM linter and drift detector. Dependency-free Python
 (standard library only) — no network access, no vulnerability-feed API key,
 nothing to trust beyond the SBOM files you hand it.
@@ -55,6 +59,7 @@ Checks:
 
 | Check | Severity | What it catches |
 |---|---|---|
+| `missing-name` | high | component has no stable name and cannot be tracked reliably |
 | `missing-hash` | medium | component has no `hashes` entry — contents can't be verified |
 | `missing-license` | low | component declares no license |
 | `unknown-version` | medium | version is empty or a floating marker (`latest`, `unknown`, `0.0.0`, ...) |
@@ -71,9 +76,10 @@ Checks:
 | Check | Severity | What it catches |
 |---|---|---|
 | `hash-changed-same-version` | high | name+version identical, hash differs — likely tampering, a mutable tag, or a non-reproducible build |
+| `hash-removed-same-version` | medium | integrity hashes disappeared without a version change |
 | `component-added` | medium | new component in `current` not present in `baseline` |
 | `version-changed` | info | same component, version bumped |
-| `license-changed` | low | same name+version, declared license changed |
+| `license-changed` | low | same name+version, declared license changed or disappeared |
 | `component-removed` | info | component in `baseline` dropped from `current` |
 
 ### Output formats and CI gating
@@ -86,11 +92,11 @@ sbom-drift --format markdown lint sbom.json -o report.md
 `--fail-on {high,medium,low,info,never}` (default `high`) controls the exit
 code: `1` if a finding at or above that severity exists, `0` otherwise, `2`
 on a malformed input file. Wire it into CI as a build gate, e.g.
-`sbom-drift diff baseline.json current.json --fail-on high`.
+`sbom-drift --fail-on high diff baseline.json current.json`.
 
 ## Design
 
-- `sbom_drift/cyclonedx.py` — reads CycloneDX JSON (`bomFormat`,
+- `sbom_drift/cyclonedx.py` — reads and flattens CycloneDX JSON (`bomFormat`,
   `components`, `purl`, `hashes`, `licenses`). Component identity for
   diffing is the purl with its version segment stripped, so a version bump
   is recognized as *the same component changing* rather than one component

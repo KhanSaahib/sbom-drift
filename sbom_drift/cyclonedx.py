@@ -88,18 +88,21 @@ def _extract_hashes(raw_hashes: Any) -> dict[str, str]:
     out: dict[str, str] = {}
     if not raw_hashes:
         return out
+    if not isinstance(raw_hashes, list):
+        return out
     for entry in raw_hashes:
         if isinstance(entry, dict) and entry.get("alg") and entry.get("content"):
-            out[str(entry["alg"])] = str(entry["content"])
+            out[str(entry["alg"]).upper()] = str(entry["content"]).lower()
     return out
 
 
 def _parse_component(raw: dict[str, Any]) -> Component:
+    purl = raw.get("purl")
     return Component(
         name=str(raw.get("name", "")),
         version=str(raw.get("version", "")),
         type=str(raw.get("type", "library")),
-        purl=raw.get("purl"),
+        purl=purl if isinstance(purl, str) else None,
         bom_ref=raw.get("bom-ref") or raw.get("bomRef"),
         hashes=_extract_hashes(raw.get("hashes")),
         licenses=_extract_licenses(raw.get("licenses")),
@@ -109,12 +112,25 @@ def _parse_component(raw: dict[str, Any]) -> Component:
     )
 
 
+def _walk_components(raw_components: list[Any]) -> list[dict[str, Any]]:
+    """Flatten top-level and nested CycloneDX component entries."""
+    flattened: list[dict[str, Any]] = []
+    for raw in raw_components:
+        if not isinstance(raw, dict):
+            continue
+        flattened.append(raw)
+        nested = raw.get("components", [])
+        if isinstance(nested, list):
+            flattened.extend(_walk_components(nested))
+    return flattened
+
+
 def load(path: str | Path) -> SBOMDocument:
     """Load and validate a CycloneDX JSON SBOM from disk."""
     p = Path(path)
     try:
         raw = json.loads(p.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         raise SBOMFormatError(f"{p}: not valid JSON ({exc})") from exc
 
     if not isinstance(raw, dict) or raw.get("bomFormat") != "CycloneDX":
@@ -127,13 +143,15 @@ def load(path: str | Path) -> SBOMDocument:
     if not isinstance(components_raw, list):
         raise SBOMFormatError(f"{p}: 'components' must be a list")
 
-    components = tuple(
-        _parse_component(c) for c in components_raw if isinstance(c, dict)
-    )
+    spec_version = raw.get("specVersion")
+    if not isinstance(spec_version, str) or not spec_version.strip():
+        raise SBOMFormatError(f"{p}: missing or invalid 'specVersion'")
+
+    components = tuple(_parse_component(c) for c in _walk_components(components_raw))
 
     return SBOMDocument(
         format=raw.get("bomFormat", ""),
-        spec_version=str(raw.get("specVersion", "")),
+        spec_version=spec_version,
         serial_number=raw.get("serialNumber"),
         components=components,
         source_path=str(p),

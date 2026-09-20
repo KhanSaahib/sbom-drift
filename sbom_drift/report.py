@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 
+from . import __version__
 from .findings import Finding
+
+SCHEMA_VERSION = 1
 
 SEVERITY_LABEL = {
     "high": "HIGH",
@@ -15,6 +19,9 @@ SEVERITY_LABEL = {
 
 def to_json(findings: list[Finding], *, mode: str, sources: dict[str, str]) -> str:
     payload = {
+        "schema_version": SCHEMA_VERSION,
+        "tool_version": __version__,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "mode": mode,
         "sources": sources,
         "finding_count": len(findings),
@@ -51,9 +58,10 @@ def to_markdown(findings: list[Finding], *, mode: str, sources: dict[str, str]) 
     lines.append("|---|---|---|---|")
     for f in findings:
         message = f.message.replace("|", "\\|")
+        component = f.component.replace("|", "\\|").replace("`", "\\`")
         lines.append(
             f"| {SEVERITY_LABEL.get(f.severity, f.severity)} | {f.check} | "
-            f"`{f.component}` | {message} |"
+            f"`{component}` | {message} |"
         )
     return "\n".join(lines)
 

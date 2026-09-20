@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
+from . import __version__
 from .cyclonedx import SBOMFormatError, load
 from .diff import diff as diff_sboms
 from .findings import Finding
@@ -35,26 +37,27 @@ def build_parser() -> argparse.ArgumentParser:
         default="high",
         help="exit non-zero if a finding at or above this severity exists (default: high)",
     )
-    parser.add_argument("-o", "--output", help="write report to this path instead of stdout")
+    parser.add_argument("-o", "--output", type=Path, help="write report to this path instead of stdout")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
     sub = parser.add_subparsers(dest="command", required=True)
 
     lint_p = sub.add_parser("lint", help="check a single SBOM for hygiene issues")
-    lint_p.add_argument("sbom", help="path to a CycloneDX JSON SBOM")
+    lint_p.add_argument("sbom", type=Path, help="path to a CycloneDX JSON SBOM")
 
     diff_p = sub.add_parser("diff", help="compare two SBOM snapshots for drift")
-    diff_p.add_argument("baseline", help="path to the baseline CycloneDX JSON SBOM")
-    diff_p.add_argument("current", help="path to the current CycloneDX JSON SBOM")
+    diff_p.add_argument("baseline", type=Path, help="path to the baseline CycloneDX JSON SBOM")
+    diff_p.add_argument("current", type=Path, help="path to the current CycloneDX JSON SBOM")
 
     return parser
 
 
-def _emit(report_text: str, output: str | None) -> None:
+def _emit(report_text: str, output: Path | None) -> None:
     if output:
-        with open(output, "w", encoding="utf-8") as fh:
-            fh.write(report_text)
-            if not report_text.endswith("\n"):
-                fh.write("\n")
+        output.write_text(
+            report_text if report_text.endswith("\n") else report_text + "\n",
+            encoding="utf-8",
+        )
     else:
         print(report_text)
 
@@ -83,7 +86,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     report_text = render(findings, mode=mode, sources=sources, fmt=args.format)
-    _emit(report_text, args.output)
+    try:
+        _emit(report_text, args.output)
+    except OSError as exc:
+        print(f"error: could not write report: {exc}", file=sys.stderr)
+        return 2
 
     if args.fail_on == "never":
         return 0

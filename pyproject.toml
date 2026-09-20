@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,9 +8,28 @@ version = "0.1.0"
 description = "Offline CycloneDX SBOM linter and drift detector"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "KhanSaahib" }]
 dependencies = []
+keywords = ["sbom", "cyclonedx", "supply-chain", "security", "drift-detection"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/KhanSaahib/sbom-drift"
+Issues = "https://github.com/KhanSaahib/sbom-drift/issues"
+Source = "https://github.com/KhanSaahib/sbom-drift"
 
 [project.scripts]
 sbom-drift = "sbom_drift.cli:main"
