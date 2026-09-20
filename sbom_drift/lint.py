@@ -141,6 +141,15 @@ CHECKS = (
 
 def lint(doc: SBOMDocument) -> list[Finding]:
     findings: list[Finding] = []
+    if not doc.components:
+        findings.append(
+            Finding(
+                check="empty-sbom",
+                severity="high",
+                component="(document)",
+                message="SBOM contains no components and provides no dependency visibility",
+            )
+        )
     for check in CHECKS:
         findings.extend(check(doc.components))
     return sort_findings(findings)

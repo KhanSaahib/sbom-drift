@@ -59,6 +59,7 @@ Checks:
 
 | Check | Severity | What it catches |
 |---|---|---|
+| `empty-sbom` | high | document has no components and provides no dependency visibility |
 | `missing-name` | high | component has no stable name and cannot be tracked reliably |
 | `missing-hash` | medium | component has no `hashes` entry — contents can't be verified |
 | `malformed-hash` | medium | declared digest contains non-hex content |

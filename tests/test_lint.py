@@ -72,6 +72,14 @@ class LintTests(unittest.TestCase):
         )
         self.assertIn("malformed-hash", {finding.check for finding in lint(doc)})
 
+    def test_empty_sbom_is_not_reported_as_clean(self):
+        from sbom_drift.cyclonedx import SBOMDocument
+
+        doc = SBOMDocument("CycloneDX", "1.5", None, (), "empty.json")
+        findings = lint(doc)
+        self.assertEqual([finding.check for finding in findings], ["empty-sbom"])
+        self.assertEqual(findings[0].severity, "high")
+
 
 if __name__ == "__main__":
     unittest.main()
