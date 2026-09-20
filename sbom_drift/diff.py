@@ -83,6 +83,22 @@ def diff(baseline: SBOMDocument, current: SBOMDocument) -> list[Finding]:
                     details={"before_hashes": before.hashes, "after_hashes": after.hashes},
                 )
             )
+        elif before.hashes and after.hashes and not (set(before.hashes) & set(after.hashes)):
+            findings.append(
+                Finding(
+                    check="hash-not-comparable-same-version",
+                    severity="medium",
+                    component=before.coordinate,
+                    message=(
+                        "hash algorithms changed with no common digest, so identical "
+                        "contents cannot be verified across the two SBOMs"
+                    ),
+                    details={
+                        "before_algorithms": sorted(before.hashes),
+                        "after_algorithms": sorted(after.hashes),
+                    },
+                )
+            )
         elif before.hashes and not after.hashes:
             findings.append(
                 Finding(

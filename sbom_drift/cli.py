@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     except SBOMFormatError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    except FileNotFoundError as exc:
+    except OSError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 

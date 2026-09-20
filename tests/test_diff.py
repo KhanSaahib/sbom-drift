@@ -112,6 +112,20 @@ class DiffTests(unittest.TestCase):
         )
         self.assertEqual(diff(before, after), [])
 
+    def test_changed_hash_algorithm_is_not_treated_as_comparable(self):
+        before = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={"SHA-256": "aa"}),),
+            "before.json",
+        )
+        after = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={"SHA-512": "bb"}),),
+            "after.json",
+        )
+        findings = diff(before, after)
+        self.assertEqual([finding.check for finding in findings], ["hash-not-comparable-same-version"])
+
 
 if __name__ == "__main__":
     unittest.main()

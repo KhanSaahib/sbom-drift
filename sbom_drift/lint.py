@@ -8,11 +8,13 @@ the same purl claiming different versions).
 from __future__ import annotations
 
 from collections import defaultdict
+import re
 
 from .cyclonedx import Component, SBOMDocument
 from .findings import Finding, sort_findings
 
 UNKNOWN_VERSION_MARKERS = {"", "latest", "unknown", "0.0.0", "unspecified"}
+_HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
 
 
 def check_missing_name(components: tuple[Component, ...]) -> list[Finding]:
@@ -42,6 +44,23 @@ def check_missing_hash(components: tuple[Component, ...]) -> list[Finding]:
                         "or registry compromise swapping its contents would "
                         "be undetectable"
                     ),
+                )
+            )
+    return findings
+
+
+def check_malformed_hash(components: tuple[Component, ...]) -> list[Finding]:
+    findings = []
+    for component in components:
+        malformed = [algorithm for algorithm, digest in component.hashes.items() if not _HEX_RE.fullmatch(digest)]
+        if malformed:
+            findings.append(
+                Finding(
+                    check="malformed-hash",
+                    severity="medium",
+                    component=component.coordinate,
+                    message=f"non-hex digest content for: {', '.join(sorted(malformed))}",
+                    details={"algorithms": sorted(malformed)},
                 )
             )
     return findings
@@ -113,6 +132,7 @@ def check_duplicate_components(components: tuple[Component, ...]) -> list[Findin
 CHECKS = (
     check_missing_name,
     check_missing_hash,
+    check_malformed_hash,
     check_missing_license,
     check_unknown_version,
     check_duplicate_components,

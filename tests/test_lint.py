@@ -62,6 +62,16 @@ class LintTests(unittest.TestCase):
         self.assertEqual({component.name for component in doc.components}, {"parent", "nested"})
         self.assertIn("unknown-version", {finding.check for finding in lint(doc)})
 
+    def test_malformed_hash_is_reported(self):
+        from sbom_drift.cyclonedx import Component, SBOMDocument
+
+        doc = SBOMDocument(
+            "CycloneDX", "1.5", None,
+            (Component("pkg", "1.0", hashes={"SHA-256": "not-a-digest"}, licenses=("MIT",)),),
+            "bad.json",
+        )
+        self.assertIn("malformed-hash", {finding.check for finding in lint(doc)})
+
 
 if __name__ == "__main__":
     unittest.main()

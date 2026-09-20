@@ -1,6 +1,6 @@
 # sbom-drift
 
-[![CI](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml)
+[![CI](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml?query=branch%3Amain)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -61,6 +61,7 @@ Checks:
 |---|---|---|
 | `missing-name` | high | component has no stable name and cannot be tracked reliably |
 | `missing-hash` | medium | component has no `hashes` entry — contents can't be verified |
+| `malformed-hash` | medium | declared digest contains non-hex content |
 | `missing-license` | low | component declares no license |
 | `unknown-version` | medium | version is empty or a floating marker (`latest`, `unknown`, `0.0.0`, ...) |
 | `duplicate-component-conflicting-version` | high | same purl/name appears twice with different versions |
@@ -77,6 +78,7 @@ Checks:
 |---|---|---|
 | `hash-changed-same-version` | high | name+version identical, hash differs — likely tampering, a mutable tag, or a non-reproducible build |
 | `hash-removed-same-version` | medium | integrity hashes disappeared without a version change |
+| `hash-not-comparable-same-version` | medium | hash algorithms changed, leaving no digest that can be compared |
 | `component-added` | medium | new component in `current` not present in `baseline` |
 | `version-changed` | info | same component, version bumped |
 | `license-changed` | low | same name+version, declared license changed or disappeared |
