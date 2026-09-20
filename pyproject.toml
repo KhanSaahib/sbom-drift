@@ -29,12 +29,20 @@ classifiers = [
 Homepage = "https://github.com/KhanSaahib/sbom-drift"
 Issues = "https://github.com/KhanSaahib/sbom-drift/issues"
 Source = "https://github.com/KhanSaahib/sbom-drift"
+Changelog = "https://github.com/KhanSaahib/sbom-drift/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/KhanSaahib/sbom-drift#readme"
+Security = "https://github.com/KhanSaahib/sbom-drift/security/policy"
 
 [project.scripts]
 sbom-drift = "sbom_drift.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["build>=1.2", "pytest>=8"]
 
 [tool.setuptools.packages.find]
 include = ["sbom_drift*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]
