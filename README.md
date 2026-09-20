@@ -1,12 +1,61 @@
 # sbom-drift
 
-[![CI](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml?query=branch%3Amain)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+<p align="center">
+  <img src="docs/assets/sbom-drift-social.png" alt="Two software dependency graphs being compared for drift" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/KhanSaahib/sbom-drift/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="https://www.python.org/downloads/"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-2563eb.svg"></a>
+  <img alt="Offline first" src="https://img.shields.io/badge/network-offline--first-0891b2.svg">
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-16a34a.svg"></a>
+</p>
+
+<p align="center"><strong>Catch weak SBOMs and suspicious dependency drift before they reach production.</strong></p>
+
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#usage">Usage</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+> [!TIP]
+> **Start here:** Run the fixture-backed [quick start](#quick-start). If it helps, [star this repo](https://github.com/KhanSaahib/sbom-drift) and [follow @KhanSaahib](https://github.com/KhanSaahib) for more practical blue-team tools.
 
 Offline CycloneDX SBOM linter and drift detector. Dependency-free Python
 (standard library only) — no network access, no vulnerability-feed API key,
 nothing to trust beyond the SBOM files you hand it.
+
+- **Lint:** find missing hashes, licenses, versions, names, and conflicting duplicates.
+- **Diff:** expose changed or removed hashes, component churn, and metadata drift.
+- **Gate:** choose a failure threshold and emit text, Markdown, or schema-versioned JSON.
+
+## Quick start
+
+Use the included fixtures to see both modes immediately:
+
+```bash
+git clone https://github.com/KhanSaahib/sbom-drift.git
+cd sbom-drift
+python -m pip install -e .
+sbom-drift --fail-on never lint tests/fixtures/bad_hygiene.json
+sbom-drift --fail-on never diff tests/fixtures/baseline.json tests/fixtures/current_drift.json
+```
+
+Then replace the fixture paths with SBOMs from your own builds.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Current SBOM] --> C[Lint checks]
+    B[Baseline SBOM] --> D[Drift comparison]
+    A --> D
+    C --> E[Prioritized findings]
+    D --> E
+    E --> F[Report or CI gate]
+```
 
 ## Why
 
